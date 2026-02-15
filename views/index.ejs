@@ -20,6 +20,7 @@
 								<th> First Name </th>
 								<th> Last Name </th>
 								<th> Email </th>
+								<th> &nbsp; </th>
 							</tr>
 							</thead>
 							<% let i=0; %>
@@ -28,6 +29,11 @@
 								<td><%= allUsers[i].first_name %></td>
 								<td><%= allUsers[i].last_name %></td>
 								<td><%= allUsers[i].email %></td>
+								<td><a href="/deleteUser?id=<%= allUsers[i].web_user_id %>">
+									<span class="icon is-small">
+										<i class="fas fa-user-times"></i>
+									</span></a>
+								</td>
 							</tr>
 							<% } %>
 							<tfoot>
