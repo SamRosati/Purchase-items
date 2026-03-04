@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+</head>
+<body>
+    <section class="section">
+        <div class="column is-10 is-offset-1 notification is-info is-light box container">
+            <div class="title">Reviews for <%= restaurantName %></div>
+            <table class="table is-bordered is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Review</th>
+                        <th>By</th>
+                        <th>Rating</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% reviews.forEach(review => { %>
+                    <tr>
+                        <td><%= review.details %></td>
+                        <td><%= review.reviewer_name %></td>
+                        <td><%= review.rating %>/5</td>
+                        <td>
+                            <a href="/deleteReview?id=<%= review.review_id %>&restaurant_id=<%= restaurantId %>">
+                                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="4">There are <%= reviews.length %> reviews.</td></tr>
+                </tfoot>
+            </table>
+
+            <form action="/addReview" method="POST">
+                <h2 class="subtitle">Add New Review</h2>
+                <input type="hidden" name="restaurant_id" value="<%= restaurantId %>">
+                <div class="field"><input name="reviewer_name" class="input" placeholder="Your name" required></div>
+                <div class="field"><input name="details" class="input" placeholder="Review" required></div>
+                <div class="field"><input name="rating" class="input" type="number" min="0" max="5" placeholder="Rating (0 to 5)" required></div>
+                <button type="submit" class="button is-link">Add</button>
+            </form>
+            <br>
+            <a href="/" class="button is-light">Back to Restaurants</a>
+        </div>
+    </section>
+</body>
+</html>

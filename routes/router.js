@@ -1,51 +1,82 @@
 const router = require("express").Router();
-const database = include("databaseConnection");
 const dbModel = include("databaseAccessLayer");
 
+// 1. Display all restaurants
 router.get("/", async (req, res) => {
-  console.log("page hit");
   try {
-    const result = await dbModel.getAllUsers();
-    res.render("index", { allUsers: result });
-    //Output the results of the query to the Heroku Logs
-    console.log(result);
+    const result = await dbModel.getAllRestaurants();
+    res.render("index", { allRestaurants: result });
   } catch (err) {
-    res.render("error", { message: "Error reading from MySQL" });
-    console.log("Error reading from mysql");
-    console.log(err);
+    res.render("error", { message: "Error reading restaurants from MySQL" });
   }
 });
 
-router.post("/addUser", async (req, res) => {
-  console.log("form submit");
-  console.log(req.body);
+// 2. Add a new restaurant 
+router.post("/addRestaurant", async (req, res) => {
   try {
-    const success = await dbModel.addUser(req.body);
+    const success = await dbModel.addRestaurant(req.body);
     if (success) {
       res.redirect("/");
     } else {
-      res.render("error", { message: "Error writing to MySQL" });
-      console.log("Error writing to MySQL");
+      res.render("error", { message: "Error adding restaurant" });
     }
   } catch (err) {
-    res.render("error", { message: "Error writing to MySQL" });
-    console.log("Error writing to MySQL");
-    console.log(err);
+    res.render("error", { message: "Error adding restaurant" });
   }
 });
 
-router.get("/deleteUser", async (req, res) => {
-  console.log("delete user");
-  console.log(req.query);
-  let userId = req.query.id;
-  if (userId) {
-    const success = await dbModel.deleteUser(userId);
+// 3. Delete a restaurant and its reviews
+router.get("/deleteRestaurant", async (req, res) => {
+  const restaurantId = req.query.id;
+  if (restaurantId) {
+    const success = await dbModel.deleteRestaurant(restaurantId);
     if (success) {
       res.redirect("/");
     } else {
-      res.render("error", { message: "Error writing to MySQL" });
-      console.log("Error writing to mysql");
-      console.log(err);
+      res.render("error", { message: "Error deleting restaurant" });
+    }
+  }
+});
+
+// 4. Show reviews for a specific restaurant
+router.get("/showReviews", async (req, res) => {
+  try {
+    const restaurantId = req.query.id;
+    const data = await dbModel.getReviewsByRestaurant(restaurantId);
+    res.render("reviews", { 
+      reviews: data.reviews, 
+      restaurantName: data.restaurantName, 
+      restaurantId: restaurantId 
+    });
+  } catch (err) {
+    res.render("error", { message: "Error reading reviews" });
+  }
+});
+
+// 5. Add a new review 
+router.post("/addReview", async (req, res) => {
+  try {
+    const success = await dbModel.addReview(req.body);
+    if (success) {
+      res.redirect(`/showReviews?id=${req.body.restaurant_id}`);
+    } else {
+      res.render("error", { message: "Error adding review" });
+    }
+  } catch (err) {
+    res.render("error", { message: "Error adding review" });
+  }
+});
+
+// 6. Delete a specific review 
+router.get("/deleteReview", async (req, res) => {
+  const reviewId = req.query.id;
+  const restaurantId = req.query.restaurant_id;
+  if (reviewId) {
+    const success = await dbModel.deleteReview(reviewId);
+    if (success) {
+      res.redirect(`/showReviews?id=${restaurantId}`);
+    } else {
+      res.render("error", { message: "Error deleting review" });
     }
   }
 });

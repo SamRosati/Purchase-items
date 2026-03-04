@@ -9,7 +9,8 @@
 		"dotenv": "^17.2.3",
 		"ejs": "^3.1.10",
 		"express": "^5.2.1",
-		"mysql2": "^3.16.0"
+		"mysql2": "^3.16.0",
+		"nodemon": "^3.1.14"
 	},
 	"author": "Patrick",
 	"license": "ISC"
