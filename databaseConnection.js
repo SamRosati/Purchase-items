@@ -37,6 +37,10 @@ const requireSsl = Boolean(
 	toBool(readEnv('DB_SSL_REQUIRED')) ||
 	host.endsWith('.aivencloud.com')
 );
+const sslCa = readEnv('DB_SSL_CA').replace(/\\n/g, '\n');
+const rejectUnauthorized = sslCa
+	? !toBool(readEnv('DB_SSL_REJECT_UNAUTHORIZED_FALSE'))
+	: false;
 
 const dbConfig = {
 	host,
@@ -46,7 +50,12 @@ const dbConfig = {
 	database: urlConfig?.database || readEnv('DB_DATABASE'),
 	multipleStatements: false,
 	namedPlaceholders: true,
-	ssl: requireSsl ? { rejectUnauthorized: true } : undefined
+	ssl: requireSsl
+		? {
+			rejectUnauthorized,
+			ca: sslCa || undefined
+		}
+		: undefined
 };
 
 const database = mysql.createPool(dbConfig);
