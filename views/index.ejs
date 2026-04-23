@@ -10,33 +10,48 @@
             <div class="maincolumns columns is-desktop is-vcentered">
                 <div class="column is-10 is-offset-1 notification is-info is-light box container">
                     <div class="title">
-                        Restaurants
+                        Purchase Items
                     </div>
-                    <% if (locals.allRestaurants) { %>
-                        <div class="table-container">
+                    <% const purchaseItems = Array.isArray(allPurchaseItems) ? allPurchaseItems : []; %>
+                    <% const purchaseSummary = summary || { total_cost: 0, total_unique_items: 0 }; %>
+                    <div class="table-container">
                         <table class="table is-bordered is-hoverable is-striped is-narrow">
                             <thead>
                             <tr>
-                                <th> Name </th>
+                                <th> Item Name </th>
                                 <th> Description </th>
-                                <th> &nbsp; </th> <th> &nbsp; </th> </tr>
+                                <th> Cost </th>
+                                <th> Quantity </th>
+                                <th> &nbsp; </th>
+                                <th> &nbsp; </th>
+                                <th> &nbsp; </th>
+                            </tr>
                             </thead>
                             <tbody>
-                            <% for(let i=0; i < allRestaurants.length; i++) { %>
+                            <% for(let i=0; i < purchaseItems.length; i++) { %>
                             <tr>
-                                <td><%= allRestaurants[i].name %></td>
-                                <td><%= allRestaurants[i].description %></td>
+                                <td><%= purchaseItems[i].item_name %></td>
+                                <td><%= purchaseItems[i].item_description %></td>
+                                <td>$<%= Number(purchaseItems[i].cost).toFixed(2) %></td>
+                                <td><%= purchaseItems[i].quantity %></td>
                                 <td>
-                                    <a href="/deleteRestaurant?id=<%= allRestaurants[i].restaurant_id %>">
+                                    <a href="/decreaseQuantity?id=<%= purchaseItems[i].purchase_item_id %>">
                                         <span class="icon is-small">
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-caret-square-down"></i>
                                         </span>
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="/showReviews?id=<%= allRestaurants[i].restaurant_id %>">
+                                    <a href="/increaseQuantity?id=<%= purchaseItems[i].purchase_item_id %>">
                                         <span class="icon is-small">
-                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-caret-square-up"></i>
+                                        </span>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="/deletePurchaseItem?id=<%= purchaseItems[i].purchase_item_id %>">
+                                        <span class="icon is-small">
+                                            <i class="fas fa-trash"></i>
                                         </span>
                                     </a>
                                 </td>
@@ -45,25 +60,40 @@
                             </tbody>
                             <tfoot>
                                 <tr> 
-                                    <td colspan="4">
-                                        There are <%= allRestaurants.length %> restaurants.
+                                    <td colspan="7">
+                                        There are <%= purchaseItems.length %> unique items.
+                                    </td> 
+                                </tr>
+                                <tr>
+                                    <td colspan="7">
+                                        Purchase total: $<%= Number(purchaseSummary.total_cost).toFixed(2) %>
                                     </td> 
                                 </tr>
                             </tfoot>
                         </table>
 
-                        <form action="/addRestaurant" method="POST">
-                            <h2 class="subtitle">Add New Restaurant</h2>
+                        <form action="/addPurchaseItem" method="POST">
+                            <h2 class="subtitle">Add New Purchase Item</h2>
                             <div class="field is-horizontal">
                                 <div class="field-body">
                                     <div class="field">
                                         <p class="control is-expanded">
-                                            <input name="name" class="input" type="text" placeholder="Restaurant Name" required>
+                                            <input name="item_name" class="input" type="text" placeholder="Item Name" maxlength="50" required>
                                         </p>
                                     </div>
                                     <div class="field">
                                         <p class="control is-expanded">
-                                            <input name="description" class="input" type="text" placeholder="Description" required>
+                                            <input name="item_description" class="input" type="text" placeholder="Description" maxlength="500" required>
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <p class="control is-expanded">
+                                            <input name="cost" class="input" type="number" min="0" step="0.0001" placeholder="Cost" required>
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <p class="control is-expanded">
+                                            <input name="quantity" class="input" type="number" min="0" step="1" placeholder="Quantity" required>
                                         </p>
                                     </div>
                                     <div class="field">
@@ -77,8 +107,7 @@
                                 </div>
                             </div>
                         </form>
-                        </div>
-                    <% } %>
+                    </div>
                 </div>
             </div>
         </section>
